@@ -22,7 +22,7 @@ pixel **initPixelArr(size_t *len, size_t *size)
     return newArr;
 }
 
-pixel **appendPixel(pixel *arr[], size_t *len, size_t *size, const coordinate_size x, const coordinate_size y)
+pixel **appendPixel(pixel **arr, size_t *len, size_t *size, const coordinate_size x, const coordinate_size y)
 {
     if(arr == NULL)
         return NULL;

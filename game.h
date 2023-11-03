@@ -15,7 +15,7 @@ pixel **appendPixel(pixel **arr, size_t *len, size_t *size, const coordinate_siz
 // if len didn't changed realloc failed.
 // when creating the pixel array give len 0 and size 0
 
-void freePixelArr(pixel **arr, const int len);
-void printPixelArr(pixel **arr, const int len);
+void freePixelArr(pixel **arr, const size_t len);
+void printPixelArr(pixel **arr, const size_t len, const size_t size);
 
 #endif

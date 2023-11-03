@@ -44,23 +44,23 @@ pixel **appendPixel(pixel *arr[], size_t *len, size_t *size, const coordinate_si
 
     arr = tempArr;
     *size = newSize;
-    arr[*len] = newPixel;
-    *len += 1;
+    arr[(*len)++] = newPixel;
+
     return arr;
 }
 
-void freePixelArr(pixel **arr, const int len)
+void freePixelArr(pixel **arr, const size_t len)
 {
-    for (int i = 0; i < len; i++)
+    for (size_t i = 0; i < len; i++)
         free(arr[i]);
     
     free(arr);
 }
 
-void printPixelArr(pixel **arr, const int len)
+void printPixelArr(pixel **arr, const size_t len, const size_t size)
 {
-    printf("Printing Pixel Array\n------------\n");
-    for (int i = 0; i < len; i++)
+    printf("Printing Pixel Array. len: %lu size: %lu\n------------\n", len, size);
+    for (size_t i = 0; i < len; i++)
         printf("%li, %li\n", arr[i]->x, arr[i]->y);
     printf("------------\nEND\n");
 }

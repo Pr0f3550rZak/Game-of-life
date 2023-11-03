@@ -1,5 +1,5 @@
 run:
-	gcc -o main main.c game.c
+	gcc -o main main.c game.c -Wall -Wextra
 	./main
 
 leak:

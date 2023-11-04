@@ -1,5 +1,6 @@
 #include "game.h"
 #include <stdbool.h>
+#include <sys/types.h>
 
 static pixel *createPixel(const coordinate_size x, const coordinate_size y)
 {

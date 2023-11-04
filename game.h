@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#define CSV_SEP ','
+
 typedef long coordinate_size;
 typedef struct{
 	coordinate_size x;
@@ -14,6 +16,8 @@ pixel **initPixelArr(size_t *len, size_t *size);
 pixel **appendPixel(pixel **arr, size_t *len, size_t *size, const coordinate_size x, const coordinate_size y);
 // if len didn't changed realloc failed.
 // when creating the pixel array give len 0 and size 0
+pixel **readPixels(pixel **arr, const char *filename, size_t *len, size_t *size);
+pixel **check(pixel **arr, size_t *len, size_t *size);
 
 void freePixelArr(pixel **arr, const size_t len);
 void printPixelArr(pixel **arr, const size_t len, const size_t size);

@@ -1,3 +1,6 @@
+all:
+	gcc -o main main.c game.c -Wall -Wextra
+
 run:
 	gcc -o main main.c game.c -Wall -Wextra
 	./main

@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define STATES 1000000000
+#define STATES 1000
 
 int main(void)
 {

@@ -2,6 +2,16 @@
 #include <stdbool.h>
 #include <sys/types.h>
 
+/*
+    We thought about implementing this in the fastest way possible but at the end of the day we realized that it 
+    didn't really matter that much, and smart people has optimized this algorithm before us, like in this link:
+    https://dotat.at/prog/life/life.html 
+    Thus we didn't really want to waste our time, and after thinking a bit on how to best implement the data structure we just
+    went and implement python-like array and didn't think further. :thumbsup:
+    If we will have the time we will revisit out implementations. But for now I think it suffices.
+*/
+
+
 static pixel *createPixel(const coordinate_size x, const coordinate_size y)
 {
     pixel *newPixel = (pixel *) malloc(sizeof(pixel));
@@ -108,18 +118,21 @@ pixel **readPixels(pixel **arr, const char *filename, size_t *len, size_t *size)
             return arr;
         }
         
-        coordinate_size x = strnlong(line, i);
-        coordinate_size y = strnlong(line+i+1, -1);
+        pixel np = {strnlong(line, i), strnlong(line+i+1, -1)};
 
-        size_t oldlen = *len;
-        arr = appendPixel(arr, len, size, x, y);
-        if(*len == oldlen)
+        if(!isInPixelArr((const pixel **)arr, *len, np))
         {
-            free(line);
-            fclose(file);
-            freePixelArr(arr, *len);
-            return NULL;
+            size_t oldlen = *len;
+            arr = appendPixel(arr, len, size, np.x, np.y);
+            if(*len == oldlen)
+            {
+                free(line);
+                fclose(file);
+                freePixelArr(arr, *len);
+                return NULL;
+            }
         }
+
     }
 
     free(line);
@@ -129,6 +142,11 @@ pixel **readPixels(pixel **arr, const char *filename, size_t *len, size_t *size)
 
 pixel **check(pixel **arr, size_t *len, size_t *size)
 {
+    /*
+        ze bezt algorizm in ze wezt (uzing balloc)
+        Time complexity: O(n^2).  
+    */
+   
     size_t newlen, newsize;
     pixel **newArr = initPixelArr(&newlen, &newsize);
     if(newArr == NULL)
@@ -202,8 +220,7 @@ void freePixelArr(pixel **arr, const size_t len)
 
 void printPixelArr(pixel **arr, const size_t len, const size_t size)
 {
-    printf("Printing Pixel Array. len: %lu size: %lu\n------------\n", len, size);
+    printf("Printing Pixel Array. len: %lu size: %lu\n", len, size);
     for (size_t i = 0; i < len; i++)
         printf("%li, %li\n", arr[i]->x, arr[i]->y);
-    printf("------------\nEND\n");
 }

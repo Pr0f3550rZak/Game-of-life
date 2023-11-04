@@ -29,6 +29,7 @@ int main(void)
         }
         pixelArr = newPixelArr;
 
+        printf("\nTHE CURRENT ITERATION IS: %d\n", i+1);
         printPixelArr(pixelArr, len, size);
     }
 

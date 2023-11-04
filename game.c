@@ -111,8 +111,15 @@ pixel **readPixels(pixel **arr, const char *filename, size_t *len, size_t *size)
         coordinate_size x = strnlong(line, i);
         coordinate_size y = strnlong(line+i+1, -1);
 
+        size_t oldlen = *len;
         arr = appendPixel(arr, len, size, x, y);
-        // check if adding was successfull
+        if(*len == oldlen)
+        {
+            free(line);
+            fclose(file);
+            freePixelArr(arr, *len);
+            return NULL;
+        }
     }
 
     free(line);
@@ -124,7 +131,8 @@ pixel **check(pixel **arr, size_t *len, size_t *size)
 {
     size_t newlen, newsize;
     pixel **newArr = initPixelArr(&newlen, &newsize);
-    //check balloc
+    if(newArr == NULL)
+        return NULL;
 
     // ADD NEW PIXELS
     for (size_t i = 0; i < *len; i++)
@@ -145,8 +153,13 @@ pixel **check(pixel **arr, size_t *len, size_t *size)
 
                     if (neighborCount == 3)
                     {
+                        size_t oldlen = newlen;
                         newArr = appendPixel(newArr, &newlen, &newsize, np.x, np.y);
-                        // check balloc
+                        if(newlen == oldlen)
+                        {
+                            freePixelArr(newArr, newlen);
+                            return NULL;
+                        }
                     }
                 }
             }
@@ -162,11 +175,15 @@ pixel **check(pixel **arr, size_t *len, size_t *size)
 
         if (neighborCount == 2 || neighborCount == 3)
         {
+            size_t oldlen = newlen;
             newArr = appendPixel(newArr, &newlen, &newsize, arr[i]->x, arr[i]->y);
-            //check balloc
+            if(newlen == oldlen)
+            {
+                freePixelArr(newArr, newlen);
+                return NULL;
+            }
         }
     }
-
 
     freePixelArr(arr, *len);
     *len = newlen;

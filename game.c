@@ -15,13 +15,19 @@ static pixel *createPixel(const coordinate_size x, const coordinate_size y)
 
 static long strnlong(const char* str, int maxLen) {
     long result = 0;
-    int i;
+    int i = 0, sign = 1;
 
-    for (i = 0; (i < maxLen || maxLen == -1) && str[i] != '\0'; i++)
+    if(str[0] == '-')
+    {
+        sign = -1;
+        i++;
+    }
+
+    for (; (i < maxLen || maxLen == -1) && str[i] != '\0'; i++)
         if (str[i] >= '0' && str[i] <= '9')
             result = result * 10 + (str[i] - '0');
 
-    return result;
+    return result * sign;
 }
 
 static bool isNeighbor(const pixel *p1, const pixel *p2)

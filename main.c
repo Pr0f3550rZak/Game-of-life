@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <ncurses.h>
 #include <signal.h>
+#include <sys/types.h>
+
 #ifdef _WIN32
 #include <windows.h>
 #define sleep(x) Sleep(x)
@@ -56,7 +58,7 @@ int main(void)
     {
         wclear(win);
         box(win, 0, 0);
-        mvwprintw(win, 0, 2, "Game Of Life");
+        mvwprintw(win, 0, 2, "Game Of Life (%ld)", (long) getpid());
 
         for (size_t i = 0; i < len; i++)
         {

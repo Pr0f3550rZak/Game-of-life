@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        /* Define the style for the canvas */
+        canvas {
+            display: block; /* Remove any default padding/margin on the canvas */
+        }
+    </style>
+
+    <title>press Space to Download</title>
+</head>
+<body>
+    <canvas id="gridCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('gridCanvas');
+        const ctx = canvas.getContext('2d');
+        const cellSize = 25; // Adjust the size of each grid cell
+        points = []
+
+        // Create a 2D array to track the color of each cell
+        const cellColors = [];
+
+        // Function to set canvas dimensions to the viewport size
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        // Function to draw the grid and fill colored cells
+        function drawGrid() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+
+            for (let x = 0; x < canvas.width; x += cellSize) {
+                for (let y = 0; y < canvas.height; y += cellSize) {
+                    const row = Math.floor(y / cellSize);
+                    const col = Math.floor(x / cellSize);
+
+                    const color = cellColors[row] && cellColors[row][col] ? cellColors[row][col] : 'lightgray';
+                    ctx.fillStyle = color;
+                    ctx.fillRect(x, y, cellSize, cellSize);
+                    ctx.strokeRect(x, y, cellSize, cellSize);
+                }
+            }
+        }
+
+        // Function to handle mouse click events
+        function handleClick(event) {
+            const x = Math.floor(event.offsetX / cellSize);
+            const y = Math.floor(event.offsetY / cellSize);
+
+            // Toggle the color of the clicked cell between white and blue
+            cellColors[y] = cellColors[y] || [];
+            cellColors[y][x] = cellColors[y][x] === 'blue' ? 'lightgray' : 'blue';
+            
+            let newp = `${x}, ${y}`;
+            let index = points.indexOf(newp);
+            if (index !== -1)
+                points.splice(index, 1);
+            else
+                points.push(newp);
+
+            drawGrid();
+        }
+
+        document.addEventListener('keydown', event => {
+            if (event.repeat) return;
+
+            if (event.code === 'Space') {
+                
+                let text = points.join("\n");
+                text += '\n';
+                const filename = "output.txt"
+
+                var element = document.createElement('a');
+                element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+                element.setAttribute('download', filename);
+
+                element.style.display = 'none';
+                document.body.appendChild(element);
+
+                element.click();
+
+                document.body.removeChild(element);
+
+            }
+        });
+
+        // Resize the canvas when the window is resized
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            drawGrid();
+        });
+
+        canvas.addEventListener('click', handleClick);
+
+        resizeCanvas();
+        drawGrid();
+    </script>
+</body>
+</html>

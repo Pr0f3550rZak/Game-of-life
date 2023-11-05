@@ -54,11 +54,9 @@
             cellColors[y] = cellColors[y] || [];
             cellColors[y][x] = cellColors[y][x] === 'blue' ? 'lightgray' : 'blue';
             
-            x = x - 34;
-            y = y - 15;
 
-            let newp = `${x}, ${y}`;
-            let index = points.indexOf(newp);
+            let newp = {'x':x, 'y':y};
+            let index = points.findIndex(p => p.x === newp.x && p.y === newp.y);
             if (index !== -1)
                 points.splice(index, 1);
             else
@@ -71,9 +69,14 @@
             if (event.repeat) return;
 
             if (event.code === 'Space') {
+                let text = '';
+                if (points.length != 0)
+                {
+                    points.forEach(p => {
+                        text += `${p.x - points[0].x},${-p.y + points[0].y}\n`
+                    });
+                }
                 
-                let text = points.join("\n");
-                text += '\n';
                 const filename = "output.txt"
 
                 var element = document.createElement('a');

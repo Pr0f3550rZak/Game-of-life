@@ -8,7 +8,7 @@
 #define sleep(x) Sleep(x)
 #else
 #include <unistd.h>
-#define sleep(x) usleep(x*1000)
+#define sleep(x) usleep((x)*1000)
 #endif
 
 //in miliseconds

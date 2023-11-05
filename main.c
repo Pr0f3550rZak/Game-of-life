@@ -1,44 +1,56 @@
 #include "game.h"
+#include "mstime.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <ncurses.h>
 #include <pthread.h>
-#include <time.h>
+#include <stdbool.h>
 
 #ifdef _WIN32
-#include <windows.h>
-#define sleep(x) Sleep(x)
+    #include <windows.h>
+    #define sleep(x) Sleep(x)
 #else
-#include <sys/types.h>
-#include <unistd.h>
-#define sleep(x) usleep((x)*1000)
+    #include <sys/types.h>
+    #include <unistd.h>
+    #define sleep(x) usleep((x)*1000)
 #endif
 
-//in miliseconds
-// lower then 10 isn't reccommended, because we were too lazy to implement frambebuffers :)
-#define TICK_RATE 100
+#define TPS 20
 
 static int keepRunning = 1;
+static bool shouldRender = true;
 static int x_add = 0;
 static int y_add = 0;
 
-void *keyListener(void *vargp)
+void *keyListener(void *varg)
 {
-    WINDOW *win = (WINDOW *)vargp;
-    int c;
-    while(keepRunning && (c = wgetch(win)))
+    char c;
+    while(keepRunning && (c = getchar()))
     {
-        if (c == KEY_UP)
+        switch (c)
+        {
+        case 'w':
             y_add++;
-        if (c == KEY_DOWN)
+            shouldRender = true;
+            break;
+        case 's':
             y_add--;
-        if (c == KEY_LEFT)
+            shouldRender = true;
+            break;
+        case 'a':
             x_add++;
-        if (c == KEY_RIGHT)
+            shouldRender = true;
+            break;
+        case 'd':
             x_add--;
-        if (c == 3)
+            shouldRender = true;
+            break;
+        case 3:
             keepRunning = 0;
+        }
     }
+
+    pthread_exit(NULL);
 }
 
 int main(void)
@@ -64,32 +76,53 @@ int main(void)
     WINDOW *win = newwin(yMax, xMax, 0, 0);
     keypad(win, 1);
     pthread_t tid;
-    pthread_create(&tid, NULL, keyListener, (void *)win); 
+    pthread_create(&tid, NULL, keyListener, NULL); 
+
+    unsigned long long delta_time = 0;
+    unsigned long long last_time = 0, current_time = 0;
 
     do
     {
-        wclear(win);
-        box(win, 0, 0);
-        mvwprintw(win, 0, 2, "Game Of Life (%ld)", (long) getpid());
+        last_time = current_time;
+        current_time = getTimeMs();
+        delta_time += current_time - last_time;
 
-        for (size_t i = 0; i < len; i++)
+        if (shouldRender)
         {
-            // check if the new pixel is inside the screen
-            coordinate_size x = pixelArr[i]->x + xMax/2 - x_add, y = pixelArr[i]->y + yMax/2 - y_add;
-            if (!(x >= xMax-1 || y >= yMax-1 || x <= 0 || y <= 0))
-                mvwprintw(win, y, x, "O");
-        }
-        wrefresh(win);
+            // render
+            wclear(win);
+            // box(win, 0, 0); // the box is twiching a bit
+            mvwprintw(win, 0, 2, "Game Of Life (%ld)", (long) getpid());
 
-        pixel **newPixelArr = check(pixelArr, &len, &size);
-        if(newPixelArr == NULL)
+            for (size_t i = 0; i < len; i++)
+            {
+                // check if the new pixel is inside the screen
+                coordinate_size x = pixelArr[i]->x + xMax/2 - x_add;
+                coordinate_size y = pixelArr[i]->y + yMax/2 - y_add;
+                if (!(x >= xMax-1 || y >= yMax-1 || x <= 0 || y <= 0))
+                    mvwprintw(win, y, x, "O");
+            }
+            wrefresh(win);
+
+            shouldRender = false;
+        }
+
+        if (delta_time >= 1000/TPS)
         {
-            freePixelArr(pixelArr, len);
-            return 1;
-        }
-        pixelArr = newPixelArr;
+            // tick
+            pixel **newPixelArr = check(pixelArr, &len, &size);
+            if(newPixelArr == NULL)
+            {
+                freePixelArr(pixelArr, len);
+                return 1;
+            }
+            pixelArr = newPixelArr;
 
-        sleep(TICK_RATE);
+            shouldRender = true;
+            delta_time = 0;
+        }
+
+        
     } while(keepRunning);
 
     wclear(win);

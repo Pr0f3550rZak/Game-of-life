@@ -2,6 +2,9 @@
 #include <stdbool.h>
 #include <sys/types.h>
 
+#define X_OFFSET 0
+#define Y_OFFSET -20
+
 /*
     We thought about implementing this in the fastest way possible but at the end of the day we realized that it 
     didn't really matter that much, and smart people has optimized this algorithm before us, like in this link:
@@ -118,7 +121,7 @@ pixel **readPixels(pixel **arr, const char *filename, size_t *len, size_t *size)
             return arr;
         }
         
-        pixel np = {strnlong(line, i), strnlong(line+i+1, -1)};
+        pixel np = {strnlong(line, i) + X_OFFSET, strnlong(line+i+1, -1) + Y_OFFSET};
 
         if(!isInPixelArr((const pixel **)arr, *len, np))
         {

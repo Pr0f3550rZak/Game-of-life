@@ -12,7 +12,8 @@
 #endif
 
 //in miliseconds
-#define TICK_RATE 100
+// lower then 10 isn't reccommended, because we were too lazy to implement frambebuffers :)
+#define TICK_RATE 10  
 
 static int keepRunning = 1;
 static WINDOW *intWin;
@@ -57,6 +58,15 @@ int main(void)
         box(win, 0, 0);
         mvwprintw(win, 0, 2, "Game Of Life");
 
+        for (size_t i = 0; i < len; i++)
+        {
+            // check if the new pixel is inside the screen
+            coordinate_size x = pixelArr[i]->x + xMax/2, y = pixelArr[i]->y + yMax/2;
+            if (!(x >= xMax-1 || y >= yMax-1 || x <= 0 || y <= 0))
+                mvwprintw(win, y, x, "O");
+        }
+        wrefresh(win);
+
         pixel **newPixelArr = check(pixelArr, &len, &size);
         if(newPixelArr == NULL)
         {
@@ -65,15 +75,6 @@ int main(void)
         }
         pixelArr = newPixelArr;
 
-        for (size_t i = 0; i < len; i++)
-        {
-            // check if the new pixel is inside the screen
-            coordinate_size x = pixelArr[i]->x + xMax/2, y = pixelArr[i]->y + yMax/2;
-            if (!(x >= xMax-1 || y >= yMax-1 || x <= 0 || y <= 0))
-                mvwprintw(win, y, x, "O");
-        }
-        
-        wrefresh(win);
         sleep(TICK_RATE);
     } while(keepRunning);
 

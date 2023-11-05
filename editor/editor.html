@@ -54,8 +54,8 @@
             cellColors[y] = cellColors[y] || [];
             cellColors[y][x] = cellColors[y][x] === 'blue' ? 'lightgray' : 'blue';
             
-            x = x - Math.floor(window.innerWidth / cellSize / 2);
-            y = y - Math.floor(window.innerHeight / cellSize / 2);
+            x = x - 34;
+            y = y - 15;
 
             let newp = `${x}, ${y}`;
             let index = points.indexOf(newp);

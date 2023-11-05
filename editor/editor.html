@@ -47,13 +47,16 @@
 
         // Function to handle mouse click events
         function handleClick(event) {
-            const x = Math.floor(event.offsetX / cellSize);
-            const y = Math.floor(event.offsetY / cellSize);
+            let x = Math.floor(event.offsetX / cellSize);
+            let y = Math.floor(event.offsetY / cellSize);
 
             // Toggle the color of the clicked cell between white and blue
             cellColors[y] = cellColors[y] || [];
             cellColors[y][x] = cellColors[y][x] === 'blue' ? 'lightgray' : 'blue';
             
+            x = x - Math.floor(window.innerWidth / cellSize / 2);
+            y = y - Math.floor(window.innerHeight / cellSize / 2);
+
             let newp = `${x}, ${y}`;
             let index = points.indexOf(newp);
             if (index !== -1)

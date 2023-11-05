@@ -18,11 +18,11 @@ static int keepRunning = 1;
 static WINDOW *intWin;
 
 void handler(int sig){
-    char c;
+    char c = 'y';
 
     wprintw(intWin, "OUCH, did you hit Ctrl+C? (%d)\nDo you really want to end life? [y/n]", sig);
     wrefresh(intWin);
-    c = wgetch(intWin);
+    // c = wgetch(intWin);
     if (c == 'y' || c == 'Y')
         keepRunning = 0;
     wclear(intWin);
@@ -69,7 +69,7 @@ int main(void)
         {
             // check if the new pixel is inside the screen
             coordinate_size x = pixelArr[i]->x + xMax/2, y = pixelArr[i]->y + yMax/2;
-            if (!(x >= xMax || y >= yMax || x <= 0 || y <= 0))
+            if (!(x >= xMax-1 || y >= yMax-1 || x <= 0 || y <= 0))
                 mvwprintw(win, y, x, "O");
         }
         
@@ -81,4 +81,5 @@ int main(void)
     endwin();
 
     return 0;
+    
 }

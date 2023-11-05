@@ -22,7 +22,7 @@ void handler(int sig){
 
     wprintw(intWin, "OUCH, did you hit Ctrl+C? (%d)\nDo you really want to end life? [y/n]", sig);
     wrefresh(intWin);
-    c = getchar();
+    c = wgetch(intWin);
     if (c == 'y' || c == 'Y')
         keepRunning = 0;
     wclear(intWin);

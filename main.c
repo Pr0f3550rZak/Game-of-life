@@ -24,7 +24,7 @@ static int y_add = 0;
 
 void *keyListener(void *varg)
 {
-    char c;
+    int c;
     while(keepRunning && (c = getchar()))
     {
         switch (c)
@@ -47,24 +47,61 @@ void *keyListener(void *varg)
             break;
         case 3:
             keepRunning = 0;
+            break;
+        case 27:
+            getchar();
+            switch (getchar())
+            {
+            case 65:
+                y_add++;
+                shouldRender = true;
+                break;
+            case 66:
+                y_add--;
+                shouldRender = true;
+                break;
+            case 67:
+                x_add--;
+                shouldRender = true;
+                break;
+            case 68:
+                x_add++;
+                shouldRender = true;
+                break;
+            }
+            break;
         }
     }
 
     pthread_exit(NULL);
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
+    if (argc != 2)
+    {
+        printf("Usage: ./main <filename>\n");
+        return -1;
+    }
+    char *filename = argv[1];
     size_t len, size;
     
     pixel **pixelArr = initPixelArr(&len, &size);
     if (pixelArr == NULL)
         return 1;
     
-    pixelArr = readPixels(pixelArr, "test.csv", &len, &size);
+    pixelArr = readPixels(pixelArr, filename, &len, &size);
     if(pixelArr == NULL)
         return 1;
     
+    // no pixels were read
+    if (len == 0)
+    {
+        freePixelArr(pixelArr, len);
+        printf("No values inside the file!\n");
+        return -1;
+    }
+
     initscr();
     raw();
     noecho();

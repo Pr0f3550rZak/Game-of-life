@@ -17,7 +17,8 @@
 
 #define TPS 20
 
-static int keepRunning = 1;
+static bool keepRunning = true;
+static bool reachedEnd = false;
 static bool shouldRender = true;
 static int x_add = 0;
 static int y_add = 0;
@@ -46,7 +47,7 @@ void *keyListener(void *varg)
             shouldRender = true;
             break;
         case 3:
-            keepRunning = 0;
+            keepRunning = false;
             break;
         case 27:
             getchar();
@@ -73,7 +74,7 @@ void *keyListener(void *varg)
         }
     }
 
-    pthread_exit(NULL);
+    pthread_exit(varg);
 }
 
 int main(int argc, char *argv[])
@@ -84,7 +85,7 @@ int main(int argc, char *argv[])
         return -1;
     }
     char *filename = argv[1];
-    size_t len, size;
+    size_t len, size, newlen, newsize;
     
     pixel **pixelArr = initPixelArr(&len, &size);
     if (pixelArr == NULL)
@@ -148,24 +149,38 @@ int main(int argc, char *argv[])
         if (delta_time >= 1000/TPS)
         {
             // tick
-            pixel **newPixelArr = check(pixelArr, &len, &size);
+            pixel **newPixelArr = check(pixelArr, &len, &newlen, &newsize);
             if(newPixelArr == NULL)
             {
                 freePixelArr(pixelArr, len);
                 return 1;
             }
+
+            if (isEqual((const pixel **)pixelArr, len, (const pixel **)newPixelArr, newlen))
+                reachedEnd = true;
+            
+            freePixelArr(pixelArr, len);
+            len = newlen;
+            size = newsize;
             pixelArr = newPixelArr;
 
             shouldRender = true;
             delta_time = 0;
         }
-
-        
-    } while(keepRunning);
+    } while(keepRunning && !reachedEnd);
 
     wclear(win);
-    freePixelArr(pixelArr, len);
     endwin();
+
+    if (reachedEnd)
+    {
+        if (len == 0)
+            printf("You ruined life! None of the pixels survived!!!\n");
+        else
+            printf("Congratz! Your pixels are gonna stay forever!!!\n");
+    }
+
+    freePixelArr(pixelArr, len);
 
     return 0;   
 }

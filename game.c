@@ -1,9 +1,8 @@
 #include "game.h"
-#include <stdbool.h>
 #include <sys/types.h>
 
 #define X_OFFSET 0
-#define Y_OFFSET -20
+#define Y_OFFSET 0
 
 /*
     We thought about implementing this in the fastest way possible but at the end of the day we realized that it 
@@ -143,15 +142,14 @@ pixel **readPixels(pixel **arr, const char *filename, size_t *len, size_t *size)
     return arr;
 }
 
-pixel **check(pixel **arr, size_t *len, size_t *size)
+pixel **check(pixel **arr, size_t *len, size_t *newlen, size_t *newsize)
 {
     /*
         ze bezt algorizm in ze wezt (uzing balloc)
         Time complexity: O(n^2).  
     */
    
-    size_t newlen, newsize;
-    pixel **newArr = initPixelArr(&newlen, &newsize);
+    pixel **newArr = initPixelArr(newlen, newsize);
     if(newArr == NULL)
         return NULL;
 
@@ -165,7 +163,7 @@ pixel **check(pixel **arr, size_t *len, size_t *size)
                     continue;
                 const pixel np = {arr[i]->x + dx, arr[i]->y + dy};
 
-                if(!isInPixelArr((const pixel **)arr, *len, np) && !isInPixelArr((const pixel **)newArr, newlen, np))
+                if(!isInPixelArr((const pixel **)arr, *len, np) && !isInPixelArr((const pixel **)newArr, *newlen, np))
                 {
                     unsigned short neighborCount = 0;
                     for (size_t j = 0; j < *len; j++)
@@ -174,11 +172,11 @@ pixel **check(pixel **arr, size_t *len, size_t *size)
 
                     if (neighborCount == 3)
                     {
-                        size_t oldlen = newlen;
-                        newArr = appendPixel(newArr, &newlen, &newsize, np.x, np.y);
-                        if(newlen == oldlen)
+                        size_t oldlen = *newlen;
+                        newArr = appendPixel(newArr, newlen, newsize, np.x, np.y);
+                        if(*newlen == oldlen)
                         {
-                            freePixelArr(newArr, newlen);
+                            freePixelArr(newArr, *newlen);
                             return NULL;
                         }
                     }
@@ -196,21 +194,32 @@ pixel **check(pixel **arr, size_t *len, size_t *size)
 
         if (neighborCount == 2 || neighborCount == 3)
         {
-            size_t oldlen = newlen;
-            newArr = appendPixel(newArr, &newlen, &newsize, arr[i]->x, arr[i]->y);
-            if(newlen == oldlen)
+            size_t oldlen = *newlen;
+            newArr = appendPixel(newArr, newlen, newsize, arr[i]->x, arr[i]->y);
+            if(*newlen == oldlen)
             {
-                freePixelArr(newArr, newlen);
+                freePixelArr(newArr, *newlen);
                 return NULL;
             }
         }
     }
 
-    freePixelArr(arr, *len);
-    *len = newlen;
-    *size = newsize;
-
     return newArr;
+}
+
+bool isEqual(const pixel **arr1, const size_t len1, const pixel **arr2, const size_t len2)
+{
+    for (size_t i = 0; i < len1; i++)
+    {
+        bool has = false;
+        for (size_t j = 0; j < len2 && !has; j++)
+            if (arr1[i]->x == arr2[j]->x && arr1[i]->y == arr2[j]->y)
+                has = true;
+        
+        if (!has)
+            return false;
+    }
+    return true;
 }
 
 void freePixelArr(pixel **arr, const size_t len)

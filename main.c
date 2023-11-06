@@ -109,10 +109,10 @@ int main(int argc, char *argv[])
 
     // TODO: fix resize window bugs
     int yMax, xMax;
-    getmaxyx(stdscr, yMax, xMax);
-    WINDOW *win = newwin(yMax, xMax, 0, 0);
-    keypad(win, 1);
     pthread_t tid;
+    WINDOW *win = stdscr;
+
+    keypad(win, 1);
     pthread_create(&tid, NULL, keyListener, NULL); 
 
     unsigned long long delta_time = 0;
@@ -120,6 +120,7 @@ int main(int argc, char *argv[])
 
     do
     {
+        getmaxyx(win, yMax, xMax);
         last_time = current_time;
         current_time = getTimeMs();
         delta_time += current_time - last_time;
@@ -128,8 +129,8 @@ int main(int argc, char *argv[])
         {
             // render
             wclear(win);
-            // box(win, 0, 0); // the box is twiching a bit
-            mvwprintw(win, 0, 2, "Game Of Life (%ld)", (long) getpid());
+            box(win, 0, 0); // the box is twiching a bit
+            mvwprintw(win, 0, 2, "Game-Of-Life-(%ld)", (long) getpid());
 
             for (size_t i = 0; i < len; i++)
             {

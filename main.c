@@ -6,15 +6,6 @@
 #include <pthread.h>
 #include <stdbool.h>
 
-#ifdef _WIN32
-    #include <windows.h>
-    #define sleep(x) Sleep(x)
-#else
-    #include <sys/types.h>
-    #include <unistd.h>
-    #define sleep(x) usleep((x)*1000)
-#endif
-
 #define TPS 20
 
 static bool keepRunning = true;
@@ -108,7 +99,6 @@ int main(int argc, char *argv[])
     noecho();
     curs_set(0);
 
-    // TODO: fix resize window bugs
     int yMax, xMax;
     pthread_t tid;
     WINDOW *win = stdscr;
@@ -131,7 +121,7 @@ int main(int argc, char *argv[])
             // render
             wclear(win);
             box(win, 0, 0); // the box is twiching a bit
-            mvwprintw(win, 0, 2, "Game-Of-Life-(%ld)", (long) getpid());
+            mvwprintw(win, 0, 2, "Game-Of-Life-(%d TPS)", TPS);
 
             for (size_t i = 0; i < len; i++)
             {

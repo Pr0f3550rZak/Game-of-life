@@ -3,8 +3,8 @@ all:
 
 run:
 	gcc -o main main.c game.c mstime.c -lncurses -Wall -Wextra
-	./main test.csv
+	./main presets/test.csv
 
 leak:
 	gcc -o main -ggdb3 main.c game.c mstime.c -lncurses
-	valgrind ./main test.csv
+	valgrind ./main presets/test.csv
